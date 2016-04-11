@@ -1,3 +1,40 @@
+/**
+The MIT License (MIT)
+
+Copyright (c) 2014-2015 Ignatius Steven (https://github.com/isteven)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/*
+4/5/16
+
+This is a fork of isteven-multi-select.js from https://github.com/isteven/angular-multi-select
+
+Original one does not support tweaking varButtonLabel and a few other things requested by business
+so I had to clone it form there and overwrite refreshButton() and make some other minor changes
+in order to meet the requirements
+
+For tracking purposes I kept refreshButton() and renamed it as refreshButtonOriginal()
+
+*/
 
 /*
  * Angular JS Multi Select
@@ -512,8 +549,9 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 }
             }
 
-            // refresh button label
-            $scope.refreshButton = function() {
+            // refresh button label - original functionality from https://github.com/isteven/angular-multi-select
+            $scope.refreshButtonOriginal = function() {
+
 
                 $scope.varButtonLabel   = '';
                 var ctr                 = 0;
@@ -557,7 +595,33 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 $scope.varButtonLabel = $sce.trustAsHtml( $scope.varButtonLabel + '<span class="caret"></span>' );
             }
 
-            // Check if a checkbox is disabled or enabled. It will check the granular control (disableProperty) and global control (isDisabled)
+
+            // refresh button label - what
+            $scope.refreshButton = function() {
+
+                $scope.varButtonLabel   = '';
+                var ctr                 = 0;
+
+                // refresh button label...
+                if ( $scope.outputModel.length === 0 ) {
+                    $scope.varButtonLabel = $scope.lang.nothingSelected;
+                }
+                else {
+                    $scope.varButtonLabel += 'Selected ' + $scope.outputModel.length + ' metrics';
+                }
+
+                $scope.varButtonLabel = $sce.trustAsHtml( $scope.varButtonLabel + '<span class="caret"></span>' );
+
+                var selectedIndicators = _.map($scope.outputModel, function (indicator) {
+                  return { id: indicator.id, name: indicator.name};
+                });
+
+                if (selectedIndicators.length > 0) {
+                    $scope.$root.$emit('rootScope:selected_indicators', selectedIndicators);
+                }
+            }
+
+            // Check if a checkbox is disabled or enabled. It will check the granular control and global control
             // Take note that the granular control has higher priority.
             $scope.itemIsDisabled = function( item ) {
 
@@ -604,7 +668,8 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 angular.element( document ).off( 'click', $scope.externalClickListener );
                 angular.element( document ).off( 'keydown', $scope.keyboardListener );
 
-                // The idea below was taken from another multi-select directive - https://github.com/amitava82/angular-multiselect
+                // The idea below was taken from another multi-select directive -
+                // https://github.com/amitava82/angular-multiselect
                 // His version is awesome if you need a more simple multi-select approach.
 
                 // close
@@ -958,9 +1023,9 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 $scope.lang.nothingSelected = $sce.trustAsHtml( $scope.translation.nothingSelected );
             }
             else {
-                $scope.lang.selectAll       = $sce.trustAsHtml( $scope.icon.selectAll  + '&nbsp;&nbsp;Select All' );
-                $scope.lang.selectNone      = $sce.trustAsHtml( $scope.icon.selectNone + '&nbsp;&nbsp;Select None' );
-                $scope.lang.reset           = $sce.trustAsHtml( $scope.icon.reset      + '&nbsp;&nbsp;Reset' );
+                $scope.lang.selectAll       = $sce.trustAsHtml( 'Select All' );
+                $scope.lang.selectNone      = $sce.trustAsHtml( 'Select None');
+                $scope.lang.reset           = $sce.trustAsHtml( 'Reset' );
                 $scope.lang.search          = 'Search...';
                 $scope.lang.nothingSelected = 'None Selected';
             }
@@ -990,7 +1055,8 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
             }, true );
 
             // watch2 for changes in input model as a whole
-            // this on updates the multi-select when a user load a whole new input-model. We also update the $scope.backUp variable
+            // this on updates the multi-select when a user load a whole new input-model.
+            // We also update the $scope.backUp variable
             $scope.$watch( 'inputModel' , function( newVal ) {
                 if ( newVal ) {
                     $scope.backUp = angular.copy( $scope.inputModel );
@@ -1026,6 +1092,11 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
 			    angular.element( document ).unbind( 'touchstart', onTouchStart);
             	angular.element( document ).unbind( 'touchmove', onTouchMove);
             });
+
+            $scope.$root.$on('rootScope:full_list_of_indicators', function (event, selectedIndicators) {
+              $scope.inputModel = selectedIndicators;
+              $scope.updateFilter();
+            });
         }
     }
 }]).run( [ '$templateCache' , function( $templateCache ) {
@@ -1058,13 +1129,6 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                             'ng-click="select( \'none\', $event );"' +
                             'ng-bind-html="lang.selectNone">' +
                         '</button>'+
-                        // reset
-                        '<button type="button" class="helperButton reset"' +
-                            'ng-disabled="isDisabled"' +
-                            'ng-if="helperStatus.reset"' +
-                            'ng-click="select( \'reset\', $event );"' +
-                            'ng-bind-html="lang.reset">'+
-                        '</button>' +
                     '</div>' +
                     // the search box
                     '<div class="line" style="position:relative" ng-if="helperStatus.filter">'+
@@ -1088,6 +1152,8 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                         // this is the spacing for grouped items
                         '<div class="acol" ng-if="item[ spacingProperty ] > 0" ng-repeat="i in numberToArray( item[ spacingProperty ] ) track by $index">'+
                     '</div>  '+
+                    // the tick/check mark
+                    '<span class="tickMark" ng-if="item[ groupProperty ] !== true && item[ tickProperty ] === true" ng-bind-html="icon.tickMark"></span>'+
                     '<div class="acol">'+
                         '<label>'+
                             // input, so that it can accept focus on keyboard click
@@ -1102,8 +1168,6 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                             '</span>'+
                         '</label>'+
                     '</div>'+
-                    // the tick/check mark
-                    '<span class="tickMark" ng-if="item[ groupProperty ] !== true && item[ tickProperty ] === true" ng-bind-html="icon.tickMark"></span>'+
                 '</div>'+
             '</div>'+
         '</div>'+

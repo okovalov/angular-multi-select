@@ -2,7 +2,6 @@
  * Don't modify things marked with ! - unless you know what you're doing
  */
 
-
 /* ! vertical layout */
 .multiSelect .vertical {
     float: none;
@@ -25,6 +24,7 @@
 .multiSelect .acol {
     display: inline-block;
     min-width: 12px;
+    margin-left: 20px;
 }
 
 /* ! */
@@ -34,6 +34,8 @@
 
 /* the multiselect button */
 .multiSelect > button {
+    width: 100%;
+    text-align: left !important;
     display: inline-block;
     position: relative;
     text-align: center;
@@ -41,8 +43,7 @@
     border: 1px solid #c6c6c6;
     padding: 1px 8px 1px 8px;
     font-size: 14px;
-    min-height : 38px !important;
-    border-radius: 4px;
+    min-height : 26px !important;
     color: #555;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -51,7 +52,6 @@
     user-select: none;
     white-space:normal;
     background-color: #fff;
-    background-image: linear-gradient(#fff, #f7f7f7);
 }
 
 /* button: hover */
@@ -82,7 +82,7 @@
     display: inline-block;
     width: 0;
     height: 0;
-    margin: 0px 0px 1px 12px  !important;
+    margin: 8px 0px 1px 12px  !important;
     vertical-align: middle;
     border-top: 4px solid #333;
     border-right: 4px solid transparent;
@@ -205,7 +205,6 @@
     display: block;
     padding: 3px;
     color: #444;
-    white-space: nowrap;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -270,7 +269,7 @@
 .multiSelect .tickMark {
     display:inline-block;
     position: absolute;
-    right: 10px;
+    left: 5px;
     top: 7px;
     font-size: 10px;
 }

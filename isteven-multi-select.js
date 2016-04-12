@@ -549,53 +549,6 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 }
             }
 
-            // refresh button label - original functionality from https://github.com/isteven/angular-multi-select
-            $scope.refreshButtonOriginal = function() {
-
-
-                $scope.varButtonLabel   = '';
-                var ctr                 = 0;
-
-                // refresh button label...
-                if ( $scope.outputModel.length === 0 ) {
-                    // https://github.com/isteven/angular-multi-select/pull/19
-                    $scope.varButtonLabel = $scope.lang.nothingSelected;
-                }
-                else {
-                    var tempMaxLabels = $scope.outputModel.length;
-                    if ( typeof attrs.maxLabels !== 'undefined' && attrs.maxLabels !== '' ) {
-                        tempMaxLabels = attrs.maxLabels;
-                    }
-
-                    // if max amount of labels displayed..
-                    if ( $scope.outputModel.length > tempMaxLabels ) {
-                        $scope.more = true;
-                    }
-                    else {
-                        $scope.more = false;
-                    }
-
-                    angular.forEach( $scope.inputModel, function( value, key ) {
-                        if ( typeof value !== 'undefined' && value[ attrs.tickProperty ] === true ) {
-                            if ( ctr < tempMaxLabels ) {
-                                $scope.varButtonLabel += ( $scope.varButtonLabel.length > 0 ? '</div>, <div class="buttonLabel">' : '<div class="buttonLabel">') + $scope.writeLabel( value, 'buttonLabel' );
-                            }
-                            ctr++;
-                        }
-                    });
-
-                    if ( $scope.more === true ) {
-                        // https://github.com/isteven/angular-multi-select/pull/16
-                        if (tempMaxLabels > 0) {
-                            $scope.varButtonLabel += ', ... ';
-                        }
-                        $scope.varButtonLabel += '(' + $scope.outputModel.length + ')';
-                    }
-                }
-                $scope.varButtonLabel = $sce.trustAsHtml( $scope.varButtonLabel + '<span class="caret"></span>' );
-            }
-
-
             // refresh button label - what
             $scope.refreshButton = function() {
 
@@ -611,10 +564,6 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 }
 
                 $scope.varButtonLabel = $sce.trustAsHtml( $scope.varButtonLabel + '<span class="caret"></span>' );
-
-                var selectedIndicators = _.map($scope.outputModel, function (indicator) {
-                  return { id: indicator.id, name: indicator.name};
-                });
             }
 
             // Check if a checkbox is disabled or enabled. It will check the granular control and global control

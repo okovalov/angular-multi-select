@@ -615,10 +615,6 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 var selectedIndicators = _.map($scope.outputModel, function (indicator) {
                   return { id: indicator.id, name: indicator.name};
                 });
-
-                if (selectedIndicators.length > 0) {
-                    $scope.$root.$emit('rootScope:selected_indicators', selectedIndicators);
-                }
             }
 
             // Check if a checkbox is disabled or enabled. It will check the granular control and global control
@@ -1091,11 +1087,6 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
             $scope.$on( '$destroy', function () {
 			    angular.element( document ).unbind( 'touchstart', onTouchStart);
             	angular.element( document ).unbind( 'touchmove', onTouchMove);
-            });
-
-            $scope.$root.$on('rootScope:full_list_of_indicators', function (event, selectedIndicators) {
-              $scope.inputModel = selectedIndicators;
-              $scope.updateFilter();
             });
         }
     }
